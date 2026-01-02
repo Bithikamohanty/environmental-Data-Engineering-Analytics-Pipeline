@@ -1,72 +1,65 @@
-# Weather Data ETL and Analysis
+# Greenhouse Gas Emissions ETL and Analytics
 
-This project loads a CSV weather dataset into PostgreSQL, performs cleaning and transformations using SQLAlchemy and pandas, and generates visual analyses such as distributions, anomaly detection, and rolling variability metrics. [file:1]
+This project ingests JSON-stat greenhouse gas emissions data, stores the raw JSON in MongoDB Atlas, flattens it into a structured table with statistic, year, sector, and value columns, and persists the cleaned emissions data into PostgreSQL for further analysis and visualization. [file:3]
 
-## Features
+## Data Flow
 
-- Load CSV data into PostgreSQL (`rawdataset` table). [file:1]  
-- Clean and normalize data into `cleandataset`. [file:1]  
-- Create processed tables: `weatherprocessed` and `weatheryearlysummary`. [file:1]  
-- Perform descriptive statistics, anomaly detection, and plots with matplotlib and seaborn. [file:1]
+- Load JSON file (e.g. `C17.20251202T161248.json`) into Python and flatten dimensions and values into a pandas DataFrame. [file:3]  
+- Upload the original JSON document(s) into MongoDB Atlas collection `rawemissions` in database `greenhousedata`. [file:3]  
+- Optionally re-extract and save a cleaned JSON snapshot to `extractedrawdata.json`. [file:3]  
+- Build a full emissions table with combinations of statistics, years, and sectors plus the numeric `value`. [file:3]  
+- Save the emissions DataFrame into a PostgreSQL database (table such as `emissions_clean`) via psycopg2/SQLAlchemy. [file:3]  
+- Produce descriptive statistics and interactive visualizations of emissions over time using matplotlib, seaborn, and plotly. [file:3]
 
-## Project Structure
+## Files
 
-- `APDV_24207438_AJ.ipynb` – Main Jupyter notebook containing all ETL, cleaning, and analysis steps. [file:1]  
-- `requirements.txt` – Python dependencies for running the notebook.  
-- `Dockerfile` – Container image definition for running the notebook against PostgreSQL.  
-- `docker-compose.yml` – Orchestration for app container + PostgreSQL.  
-- `abhishek.env` – Environment variables (database connection).  
+- `APDV_24223387_BM.ipynb` – notebook containing JSON processing, MongoDB load, DataFrame construction, and Postgres load. [file:3]  
+- `C17.20251202T161248.json` – source JSON-stat dataset (expected alongside the notebook). [file:3]  
+- `extractedrawdata.json` – extracted raw JSON array saved back from MongoDB. [file:3]  
+- `requirements.txt` – Python dependencies.  
+- `bithika.env` – environment configuration for MongoDB and PostgreSQL connections.  
+- `Dockerfile` – container image for running the notebook and ETL.  
+- `docker-compose.yaml` – multi-service setup for PostgreSQL and the app.
 
-## Prerequisites
+## Environment and Connections
 
-- Docker and Docker Compose installed.
-- The CSV input file (e.g. `C06.20251202T161217.csv`) available in the working directory or mounted into the container. [file:1]
+MongoDB Atlas:
 
-## Environment
+- Username: `BithikaMohanty`  
+- Password: `APDV@24223387`  
+- Cluster host: `apdv24223387.gunpsst.mongodb.net`  
+- Database: `greenhousedata`  
+- Collection: `rawemissions`  
+- URI pattern: `mongodb+srv://BithikaMohanty:<password>@apdv24223387.gunpsst.mongodb.net/greenhousedata?retryWrites=true&w=majority&appName=APDV24223387` [file:3]
 
-The notebook connects to PostgreSQL using host, port, database, username, and password parameters that match the PostgreSQL container. [file:1]
+PostgreSQL (Docker):
 
-Values used:
-
-- `POSTGRES_USER=AbhishekJ`  
-- `POSTGRES_PASSWORD=APDV#24207438`  
-- `POSTGRES_DB=assignment_APDV`  
-- `POSTGRES_HOST=postgres_assignment` (service name in `docker-compose.yml`)  
-- `POSTGRES_PORT=5432`  
-
-These are defined in `abhishek.env`.
-
-## Running with Docker Compose
-
-1. Build and start containers:
-
-docker-compose up --build
-
-
-2. Access the notebook server (default):
-
-- URL: `http://localhost:8888`
-- Open `APDV_24207438_AJ.ipynb` inside the container and run the cells.
-
-3. PostgreSQL access:
-
-- Host: `postgres_assignment` (from within app container)  
-- Host: `localhost` (from your machine)  
+- Service/container: `pg_emissions`  
+- User: `BithikaMohanty`  
+- Password: `APDV@24223387`  
+- Database: `greenhouse_data`  
 - Port: `5432`  
-- Database: `assignment_APDV`  
-- User: `AbhishekJ`  
-- Password: `APDV#24207438`  
+- Run command equivalent:
 
-## Direct PostgreSQL Run (Without Compose)
-
-If you want only the database:
-
-docker run --name postgres_assignment
--e POSTGRES_USER=AbhishekJ
--e POSTGRES_PASSWORD="APDV#24207438"
--e POSTGRES_DB=assignment_APDV
+docker run --name pg_emissions
+-e POSTGRES_USER=BithikaMohanty
+-e POSTGRES_PASSWORD="APDV@24223387"
+-e POSTGRES_DB=greenhouse_data
 -p 5432:5432
 -d postgres:15
 
 
-Then run the notebook on your host, ensuring the connection uses `localhost:5432` with these credentials. [file:1]
+The notebook connects to these services using `pymongo.MongoClient` for MongoDB and psycopg2/SQLAlchemy URL `postgresql+psycopg2://user:password@host:port/dbname`. [file:3]
+
+## Running with Docker Compose
+
+1. Place the JSON source file and notebook in the project directory.  
+2. Build and start:
+
+docker-compose up --build
+
+
+3. Open the notebook at `http://localhost:8888`, adjust connection cells to read environment variables if desired, and run the ETL:  
+- Pull raw data from `C17.20251202T161248.json`.  
+- Load and confirm data in MongoDB (`rawemissions`).  
+- Flatten and write to PostgreSQL `greenhouse_data`. [file:3]
