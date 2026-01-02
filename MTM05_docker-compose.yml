@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  postgres_precip:
+    image: postgres:15
+    container_name: postgres_precip
+    environment:
+      POSTGRES_USER: VarshaBalip
+      POSTGRES_PASSWORD: "APDV24331710"
+      POSTGRES_DB: precipitation
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_precip:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: precip_app
+    env_file:
+      - varsha.env
+    depends_on:
+      - postgres_precip
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+
+volumes:
+  pgdata_precip:
