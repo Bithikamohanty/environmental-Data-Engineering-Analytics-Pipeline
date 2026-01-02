@@ -1,0 +1,30 @@
+# docker-compose.yaml
+version: "3.9"
+
+services:
+  pg_emissions:
+    image: postgres:15
+    container_name: pg_emissions
+    environment:
+      POSTGRES_USER: BithikaMohanty
+      POSTGRES_PASSWORD: "APDV@24223387"
+      POSTGRES_DB: greenhouse_data
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_emissions:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: emissions_app
+    env_file:
+      - bithika.env
+    depends_on:
+      - pg_emissions
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+
+volumes:
+  pgdata_emissions:
