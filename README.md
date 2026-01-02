@@ -61,6 +61,7 @@ Notebook:
 APDV_24330710_VB.ipynb
 
 3. Greenhouse Gas Emissions ETL & Analytics
+
 Objective:
 Ingest complex JSON-stat greenhouse gas data and transform it into a relational analytics-ready structure.
 
