@@ -1,0 +1,12 @@
+pandas
+numpy
+sqlalchemy
+psycopg2-binary
+matplotlib
+seaborn
+statsmodels
+python-dateutil
+pytz
+tzdata
+greenlet
+typing-extensions
