@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  postgres_assignment:
+    image: postgres:15
+    container_name: postgres_assignment
+    environment:
+      POSTGRES_USER: AbhishekJ
+      POSTGRES_PASSWORD: "APDV#24207438"
+      POSTGRES_DB: assignment_APDV
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_apdv:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: weather_app
+    env_file:
+      - abhishek.env
+    depends_on:
+      - postgres_assignment
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+
+volumes:
+  pgdata_apdv:
