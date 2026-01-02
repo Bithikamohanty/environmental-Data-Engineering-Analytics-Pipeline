@@ -19,7 +19,7 @@ DevOps: Docker, Docker Compose
 Environment Management: .env files
 
 # Project Components
-1️. Weather Data ETL & Analysis
+1. Weather Data ETL & Analysis
 Objective:
 Load raw weather CSV data into PostgreSQL, clean and normalise it, and perform statistical and anomaly analysis.
 Key Steps:
